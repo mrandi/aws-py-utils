@@ -1,2 +1,4 @@
-# aws-py-utils
+aws-py-utils
+============
+
 Utility script for AWS
