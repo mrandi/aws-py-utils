@@ -1,28 +1,24 @@
 from pprint import pprint
-from boto.s3.connection import S3Connection
 from os.path import expanduser
 import os
+import boto3
 
 home = expanduser("~")
-LOCAL_PATH = home + '/local_folder/'
+LOCAL_PATH = home + '/bucket/'
 
-#pprint("CONTENT will be stored here:" + LOCAL_PATH)
-
-conn = S3Connection()
-bucket = conn.get_bucket('bucket-name')
-for key in bucket.list():
+s3 = boto3.resource('s3')
+bucket = s3.Bucket('bucket-name')
+for object_summary in bucket.objects.all():
     try:
-        filename = LOCAL_PATH + str(key.key)
+        filename = LOCAL_PATH + str(object_summary.key)
         dirname = os.path.dirname(filename)
-
-        #pprint("FILE: " + filename)
 
         if not os.path.exists(dirname):
             #pprint("CREATING LOCATION: " + dirname)
             os.makedirs(dirname)
 
         if not os.path.isdir(filename):
-            res = key.get_contents_to_filename(filename)
+            res = bucket.download_file(object_summary.key, filename)
     except:
-        pprint(key.name + ":" + "FAILED")
+        pprint(object_summary.key.name + ":" + "FAILED")
         raise e
